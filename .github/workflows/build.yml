@@ -35,3 +35,7 @@ jobs:
       env:
         BRANCH: ${{ steps.extract_branch.outputs.branch }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    - uses: actions/upload-artifact@v2
+      with:
+        name: cli
+        path: build/libs/cli-1.0-SNAPSHOT-all.jar
