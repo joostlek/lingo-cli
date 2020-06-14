@@ -35,6 +35,8 @@ jobs:
       env:
         BRANCH: ${{ steps.extract_branch.outputs.branch }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    - name: Build fat jar
+      run: ./gradlew shadowJar
     - uses: actions/upload-artifact@v2
       with:
         name: cli
