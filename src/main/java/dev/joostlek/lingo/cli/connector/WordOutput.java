@@ -2,6 +2,8 @@ package dev.joostlek.lingo.cli.connector;
 
 import dev.joostlek.lingo.cli.domain.Word;
 
+import java.io.IOException;
+
 public interface WordOutput {
-    void addWordToDictionary(Word word, String dictionaryId);
+    String addWordToDictionary(Word word, String dictionaryId) throws IOException;
 }

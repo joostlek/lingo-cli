@@ -1,8 +1,21 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
+    }
+}
+
+
 plugins {
     id 'java'
     id 'antlr'
     id 'maven-publish'
+    id 'idea'
 }
+
+apply plugin: 'com.github.johnrengelman.shadow'
 
 group 'dev.joostlek.lingo'
 version '1.0-SNAPSHOT'
@@ -16,26 +29,15 @@ dependencies {
     implementation('org.antlr:antlr4-runtime:4.7.2')
     implementation("com.squareup.okhttp3:okhttp:4.7.2")
     implementation("org.modelmapper:modelmapper:2.3.8")
+    compileOnly("org.projectlombok:lombok:1.18.12")
+    annotationProcessor("org.projectlombok:lombok:1.18.12")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.9.8")
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
 generateGrammarSource {
     maxHeapSize = "64m"
-    arguments += ['-package', 'me.tomassetti.examples.MarkupParser']
-    outputDirectory = new File("generated-src/antlr/main/me/tomassetti/examples/MarkupParser".toString())
-}
-
-compileJava.dependsOn generateGrammarSource
-sourceSets {
-    generated {
-        java.srcDir 'generated-src/antlr/main/'
-    }
-}
-compileJava.source sourceSets.generated.java, sourceSets.main.java
-
-clean{
-    delete "generated-src"
+    arguments += ['-package', 'dev.joostlek.lingo.cli']
 }
 
 publishing {
@@ -54,4 +56,31 @@ publishing {
             from(components.java)
         }
     }
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'dev.joostlek.lingo.cli.Main'
+        )
+    }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'project',
+                'Implementation-Version': project.version,
+                'Main-Class': 'dev.joostlek.lingo.cli.Main'
+    }
+    from {
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it).matching {
+                exclude 'META-INF/**.RSA'
+                exclude 'META-INF/MANIFEST.MF'
+                exclude 'META-INF/log4j-provider.properties'
+            } } }
+    with jar
 }
