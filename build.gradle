@@ -13,6 +13,7 @@ plugins {
     id 'antlr'
     id 'maven-publish'
     id 'idea'
+    id 'org.sonarqube' version '3.0'
 }
 
 apply plugin: 'com.github.johnrengelman.shadow'
@@ -83,4 +84,15 @@ task fatJar(type: Jar) {
                 exclude 'META-INF/log4j-provider.properties'
             } } }
     with jar
+}
+
+sonarqube {
+    properties {
+        property 'sonar.projectKey', 'joostlek_lingo-cli'
+        property 'sonar.organization', 'joostlek-github'
+        property 'sonar.login', System.getenv('SONAR_TOKEN')
+        property 'sonar.host.url', 'https://sonarcloud.io'
+        property 'sonar.coverage.jacoco.xmlReportPaths', "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+        property 'sonar.branch.name', System.getenv('BRANCH')
+    }
 }
