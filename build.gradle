@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'antlr'
+    id 'maven-publish'
 }
 
 group 'dev.joostlek.lingo'
@@ -35,4 +36,22 @@ compileJava.source sourceSets.generated.java, sourceSets.main.java
 
 clean{
     delete "generated-src"
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/joostlek/lingo-cli")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
 }
