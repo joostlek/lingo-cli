@@ -1,0 +1,3 @@
+grammar lingo;
+
+command : 'hey';
